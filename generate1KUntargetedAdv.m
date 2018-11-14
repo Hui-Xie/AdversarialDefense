@@ -2,11 +2,11 @@
 clear all;
 clc;
 disp('Generate 1000 untargeted adversarial voice examples for DeepSpeech v0.2.0');
-disp('From text file, read 1000+ sentences, convert to wave file, add noise, then test DeepSpeech:');
+disp('From text file, read 1000+ sentences, convert to wave file, add noise, then test with DeepSpeech:');
 disp('1 In Linux, you must install espeak or pico2wav software for text to speech;');
 disp('2 In Linux, you need to install DeepSpeech deep lerning software V0.2.0;');
 disp('3 make sure the input novel text without any punctuation marks;');
-disp('4 make sure deepspeech is at correct directory in the dpStrBasic string');
+disp('4 make sure deepspeech is at correct directory corresponding the dpStrBasic string');
 
 strBasicDir = '/home/hxie1/Projects/DeepSpeech';
 
@@ -36,7 +36,7 @@ fprintf(csvFileID, ['Text#, Origin_Text, Adversarial_Text, Origin_Mean, Origin_s
                       'Corr_O_A, Corr_O_R, Corr_A_R, ConsistentByText, ConsistentByCorr_A_R, \n\r']);
 
 %textN = 5; %debug try
-for i= 1:1% textN
+for i= 1:textN
     % generate wave file
     textWaveName = sprintf('%s/data/T%d.wav',strBasicDir, i);
     %[s, cmdout] = system(sprintf('espeak "%s" -w %s -s 140', textArray(i),textWaveName)); % sythesis voice
@@ -52,7 +52,7 @@ for i= 1:1% textN
     originStd = std(originWavData);
     originMean = mean(originWavData);
     
-    t = 630; %150; % numuber of scale down factor of the std of originData;
+    t = 630; % numuber of scale down factor of the std of originData;
     consistentByCorr_A_R = 1;
     while (consistentByCorr_A_R)
         t = t-20;
