@@ -1,21 +1,23 @@
-% generate 1000 untargeted adversarial voice examples for DeepSpeech v0.2.0
+% generate 1040 untargeted adversarial voice examples for DeepSpeech v0.2.0
 clear all;
 clc;
 disp('Generate 1000 untargeted adversarial voice examples for DeepSpeech v0.2.0');
 disp('From text file, read 1000+ sentences, convert to wave file, add noise, then test DeepSpeech:');
 disp('1 In Linux, you must install espeak or pico2wav software for text to speech;');
-disp('1 In Linux, you need to install DeepSpeech deep lerning software;');
-disp('3 you need make assure current dir is DeepSpeech/script/;');
-disp('4 make sure the input novel text without any punctuation marks;');
+disp('2 In Linux, you need to install DeepSpeech deep lerning software V0.2.0;');
+disp('3 make sure the input novel text without any punctuation marks;');
+disp('4 make sure deepspeech is at correct directory in the dpStrBasic string');
 
-dpStrBasic= ['deepspeech --model ../models/output_graph.pbmm '...
-    '--alphabet ../models/alphabet.txt '...
-    '--lm ../models/lm.binary '...
-    '--trie ../models/trie '...
+strBasicDir = '/home/hxie1/Projects/DeepSpeech';
+
+dpStrBasic= ['deepspeech --model /home/hxie1/Projects/DeepSpeech/models/output_graph.pbmm '...
+    '--alphabet /home/hxie1/Projects/DeepSpeech/models/alphabet.txt '...
+    '--lm /home/hxie1/Projects/DeepSpeech/models/lm.binary '...
+    '--trie /home/hxie1/Projects/DeepSpeech/models/trie '...
     '--audio '];
 
 % load N texts
-originText = fileread('../data/TaleTwoCities_Format.txt');
+originText = fileread('/home/hxie1/Projects/DeepSpeech/data/TaleTwoCities_Format.txt');
 textCell = strsplit(originText, newline);
 textArray = string(textCell);
 textN = length(textArray);
@@ -27,16 +29,16 @@ end
 % open statistics csv file
 c = clock;
 timeStr = sprintf('%4d%02d%02d-%02d%02d',c(1),c(2),c(3),c(4),c(5));
-statisCsvFile = strcat('../data/statisFile', timeStr, '.csv');
+statisCsvFile = strcat(strBasicDir, '/data/statisFile', timeStr, '.csv');
 csvFileID = fopen(statisCsvFile, 'w');
 % print csv file table header
 fprintf(csvFileID, ['Text#, Origin_Text, Adversarial_Text, Origin_Mean, Origin_std, NoiseCoeff, L1NormNoise, L2NormNoise, LInfNormNoise, SNR(db),' ... 
                       'Corr_O_A, Corr_O_R, Corr_A_R, ConsistentByText, ConsistentByCorr_A_R, \n\r']);
 
 %textN = 5; %debug try
-for i= 1:textN
+for i= 1:1% textN
     % generate wave file
-    textWaveName = sprintf('../data/T%d.wav',i);
+    textWaveName = sprintf('%s/data/T%d.wav',strBasicDir, i);
     %[s, cmdout] = system(sprintf('espeak "%s" -w %s -s 140', textArray(i),textWaveName)); % sythesis voice
     [s, cmdoutT2S] = system(sprintf('pico2wave --wave=%s  "%s"',  textWaveName, textArray(i))); % natural voice
     if 0 ~= s
