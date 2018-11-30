@@ -1,14 +1,10 @@
-
-
-%Draft
-
 % generate TARGETED adversarial voice examples for DeepSpeech v0.1.1
 clear all;
 clc;
 disp('Generate targeted adversarial voice examples for DeepSpeech v0.1.1');
-disp('From text file, read 1000+ sentences, convert to wave file, add noise, then test DeepSpeech:');
+disp('From text file, read 1000+ sentences, convert to wave file, add back-propagation noise, then test DeepSpeech:');
 disp('1 In Linux, you must install espeak or pico2wav software for text to speech;');
-disp('1 In Linux, you need to install DeepSpeech deep lerning software;');
+disp('2 In Linux, you need to install DeepSpeech deep lerning software V0.1.1;');
 disp('3 you need make assure current dir is DeepSpeech/script/;');
 disp('4 make sure the input novel text without any punctuation marks;');
 
