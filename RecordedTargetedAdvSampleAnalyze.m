@@ -17,10 +17,12 @@ targetedCsv = table2cell(readtable(targetedCsvFile, 'HeaderLines', 0));
 % generated file head
 c = clock;
 timeStr = sprintf('%4d%02d%02d-%02d%02d',c(1),c(2),c(3),c(4),c(5));
-targetedAdvStatis = strcat(dataDir,'/RecordedTargetAdvStatis', timeStr, '.csv');
+targetedAdvStatis = strcat(dataDir,'/RecordedTargetAdvAndNormalXCorr', timeStr, '.csv');
 fileID = fopen(targetedAdvStatis, 'w');
 % print csv file table header
-fprintf(fileID, ['Text#, Origin_Text, Target_Text, DeepSpeech_Recog_OriginText, DeepSpeech_Recog_Advesarial_Text,  MaxXCorr_Genuine_Record, Corr_Record_Adv, Corr_Record_Reconstr, Corr_Adv_Reconstr, \n\r']);
+fprintf(fileID, ['Text#, Origin_Text, Target_Text, DeepSpeech_Recog_RecordText, DeepSpeech_Recog_Advesarial_Text,  '...
+                  'MaxXCorr_Genuine_Record, '...
+                  'XCorr_Record_Adv, XCorr_Record_AdvRecon, XCorr_Adv_AdvRecon, Corr_Record_NormalRecon, \n\r']);
 
 for i= 1: N
 % read original T1 wave file;
@@ -32,19 +34,32 @@ for i= 1: N
    recordedFile = sprintf('%s/T%d-Record.wav',recordFileDir, i);
    advWavFile = sprintf('%s/T%d-Record-Ad.wav',recordFileDir, i);
    
-   % generate 
+   % generate recontruction for adversarial text
    advText = targetedCsv{i, 5};
-   reconstWavFile = sprintf('%s/T%d-Record-Ad-Recon.wav',recordFileDir, i);
-   [s, cmdoutT2S] = system(sprintf('pico2wave --wave=%s  "%s"',  reconstWavFile, advText)); % natural voice
+   reconstAdvWavFile = sprintf('%s/T%d-Record-Ad-Recon.wav',recordFileDir, i);
+   [s, cmdoutT2S] = system(sprintf('pico2wave --wave=%s  "%s"',  reconstAdvWavFile, advText)); % natural voice
    if 0 ~= s
        disp(cmdoutT2S);
-       fprintf("text 2 speech error at output %s, with the %dth text\n", reconstWavFile, i);
+       fprintf("text 2 speech error at output %s, with the %dth text\n", reconstAdvWavFile, i);
        break;
    end
    
+   % generate recontruction for normal text
+   normalText = targetedCsv{i, 4};
+   reconstNormalFile = sprintf('%s/T%d-Record-Normal-Recon.wav',recordFileDir, i);
+   [s, cmdoutT2S] = system(sprintf('pico2wave --wave=%s  "%s"',  reconstNormalFile, normalText)); % natural voice
+   if 0 ~= s
+       disp(cmdoutT2S);
+       fprintf("text 2 speech error at output %s, with the %dth text\n", reconstNormalFile, i);
+       break;
+   end
+   
+   
    % ['Text#, Origin_Text, Target_Text, DeepSpeech_Recog_OriginText, DeepSpeech_Recog_Advesarial_Text,  Corr_O_A, Corr_O_R, Corr_A_R, \n\r']
-   fprintf(fileID, ['%d, %s, %s, %s, %s,  %9.6f, %9.6f, %5.2f, %5.2f, \n\r'], i, targetedCsv{i,2}, targetedCsv{i,3}, targetedCsv{i,4}, targetedCsv{i,5},...
-                     Xcorrelation(genuineFile, recordedFile), correlation(recordedFile, advWavFile), correlation(recordedFile, reconstWavFile), correlation(advWavFile, reconstWavFile));
+   fprintf(fileID, ['%d, %s, %s, %s, %s,  %9.6f, %9.6f, %5.2f, %5.2f, %5.2f,\n\r'], i, targetedCsv{i,2}, targetedCsv{i,3}, targetedCsv{i,4}, targetedCsv{i,5},...
+                     Xcorrelation(genuineFile, recordedFile),...
+                 Xcorrelation(recordedFile, advWavFile), Xcorrelation(recordedFile, reconstAdvWavFile), Xcorrelation(advWavFile, reconstAdvWavFile), ...
+                 Xcorrelation(recordedFile, reconstNormalFile));
 
 end
 
