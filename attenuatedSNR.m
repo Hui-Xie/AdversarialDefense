@@ -1,51 +1,18 @@
 function result = attenuatedSNR(x,y)
-% method1: compute attenuated SNR with first computing attenuation
-% y = a*x+ w
-% assume w is zero-mean noise vector, a is the attenuated factor;
-%        x,y are column vector
-% a = sum(y.*x)/norm(x,2)^2 
-% w = y - a*x;
-% attenuatedSNR = snr(x, w);
+% y = a*x +w model, snr = 10log10(power_x/power_w)
 
-% first make sure x and y has same length
 Nx = length(x);
 Ny = length(y);
-Nmax = max(Nx,Ny);
-% if (Ny > Nx)
-%    x = wextend('ar','zpd',x, (Nmax-Nx)/2 );
-% end
-% 
-% if (Nx > Ny)
-%    y = wextend('ar','zpd',y, (Nmax-Ny)/2);
-% end
-
-% a = sum(y.* x)/ (norm(x,2)^2);
-% w = y - a*x;
-% result = snr(y,w);
-
-
-% method2: compute attenuated SNR by first using xcorr to shift signal
-% if (Ny > Nx)
-%    y = y(1:Nx);
-% end
-%  
-% if (Nx > Ny)
-%    x = x(1:Ny);
-% end 
-% 
-% [r,lags] = xcorr(x, y);
-% [~, maxPos] = max(r);
-% y = circshift(y, lags(maxPos));
-% w = y -x;
-% result = snr(x, w);
-
 % Method3: seek maximum match as the lag record effect, then compute snr
+sIsx = false;
 if (Ny > Nx)
    s = x; Ns = Nx; %small sample
    b = y; Nb = Ny; %big sample
+   sIsx = true;
 elseif (Nx > Ny)
    s = y; Ns = Ny;
    b = x; Nb = Nx;
+   sIsx = false;
 else
    w = y-x;
    result = snr(x,w);
@@ -60,8 +27,22 @@ for i=0: Nb-Ns
     corr = corrMatrix(1,2);
     if corr > maxCorr
        maxCorr = corr;
-       w = s - c;
-       tempSNR = snr(s,w);
+       if (sIsx)
+           x = s;
+           y = c;
+       else
+           y = s;
+           x = c;
+       end
+       
+       xx = norm(x, 2)^2;  %<x,x>
+       yy = norm(y, 2)^2;  %<y,y>
+       xy = sum(x.*y);    %<x,y> 
+       
+       a = xy/xx;
+       ww = yy - a*a*xx;
+       tempSNR = 10*log10(xx/ww);   
+      
     end
 end
 result = tempSNR;
