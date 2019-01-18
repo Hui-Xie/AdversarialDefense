@@ -15,7 +15,7 @@ quiver(x,y,u,v,0,'o', 'ShowArrowHead', 'off', 'MaxHeadSize', 0.1, 'LineWidth', 2
 hold on;
 plot(x, y2, 'v','LineWidth', 2 );
 xlabel('Sample');
-ylabel('Cross Correletion Coefficient p(r,y)');
+ylabel('$$\rho(\hat{x},y)$$','Interpreter','Latex');
 
 
 
