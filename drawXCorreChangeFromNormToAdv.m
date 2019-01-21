@@ -14,8 +14,8 @@ figure;
 quiver(x,y,u,v,0,'o', 'ShowArrowHead', 'off', 'MaxHeadSize', 0.1, 'LineWidth', 2);
 hold on;
 plot(x, y2, 'v','LineWidth', 2 );
-xlabel('Sample');
-ylabel('$$\rho(\hat{x},y)$$','Interpreter','Latex');
+xlabel('Sample', 'FontSize', 15, 'FontWeight','bold');
+ylabel('$$\mathbf{\rho(\hat{x},y)}$$','Interpreter','Latex', 'FontSize', 20);
 
 
 
